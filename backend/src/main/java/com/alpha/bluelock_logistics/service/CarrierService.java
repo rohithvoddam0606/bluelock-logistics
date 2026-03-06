@@ -1,5 +1,7 @@
 package com.alpha.bluelock_logistics.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,15 @@ public class CarrierService {
 	private CarrierRepository carrierRepository;
 
 	ResponseStructure<Carrier> rscarrier = new ResponseStructure<Carrier>();
+
+	public ResponseEntity<ResponseStructure<List<Carrier>>> getAllCarriers() {
+		List<Carrier> allCarriers = carrierRepository.findAll();
+		ResponseStructure<List<Carrier>> rs = new ResponseStructure<List<Carrier>>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("All carriers retrieved");
+		rs.setData(allCarriers);
+		return new ResponseEntity<ResponseStructure<List<Carrier>>>(rs, HttpStatus.OK);
+	}
 
 	// ADDING CARRIER
 	public ResponseEntity<ResponseStructure<Carrier>> saveCarrier(Carrier c) {

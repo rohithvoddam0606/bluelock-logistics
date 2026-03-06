@@ -1,5 +1,7 @@
 package com.alpha.bluelock_logistics.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,15 @@ public class DriverService {
 	private CarrierRepository carrierRepository;
 
 	ResponseStructure<Driver> rsdriver = new ResponseStructure<Driver>();
+
+	public ResponseEntity<ResponseStructure<List<Driver>>> getAllDrivers() {
+		List<Driver> allDrivers = driverRepository.findAll();
+		ResponseStructure<List<Driver>> rs = new ResponseStructure<List<Driver>>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("All drivers retrieved");
+		rs.setData(allDrivers);
+		return new ResponseEntity<ResponseStructure<List<Driver>>>(rs, HttpStatus.OK);
+	}
 
 	public ResponseEntity<ResponseStructure<Driver>> saveDriver(Driver d) {
 		driverRepository.save(d);

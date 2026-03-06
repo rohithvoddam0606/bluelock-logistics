@@ -1,5 +1,7 @@
 package com.alpha.bluelock_logistics.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,15 @@ public class AddressService {
 	private AddressRepository addressRepository;
 
 	ResponseStructure<Address> rsaddress = new ResponseStructure<Address>();
+
+	public ResponseEntity<ResponseStructure<List<Address>>> getAllAddresses() {
+		List<Address> allAddresses = addressRepository.findAll();
+		ResponseStructure<List<Address>> rs = new ResponseStructure<List<Address>>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("All addresses retrieved");
+		rs.setData(allAddresses);
+		return new ResponseEntity<ResponseStructure<List<Address>>>(rs, HttpStatus.OK);
+	}
 
 	public ResponseEntity<ResponseStructure<Address>> saveAddress(Address address) {
 		addressRepository.save(address);

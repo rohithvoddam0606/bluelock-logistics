@@ -180,6 +180,15 @@ public class OrderService {
 		return new ResponseEntity<ResponseStructure<Orders>>(rsorder, HttpStatus.OK);
 	}
 
+	public ResponseEntity<ResponseStructure<List<Orders>>> findAllOrders() {
+		List<Orders> allOrders = orderRepository.findAll();
+		ResponseStructure<List<Orders>> rsorder = new ResponseStructure<List<Orders>>();
+		rsorder.setStatuscode(HttpStatus.OK.value());
+		rsorder.setMessage("All orders retrieved");
+		rsorder.setData(allOrders);
+		return new ResponseEntity<ResponseStructure<List<Orders>>>(rsorder, HttpStatus.OK);
+	}
+
 	public ResponseEntity<ResponseStructure<List<Orders>>> cancelledOrders() {
 		List<Orders> allorderslist = orderRepository.findAll();
 		List<Orders> allcancelledorderslist = new ArrayList<Orders>();

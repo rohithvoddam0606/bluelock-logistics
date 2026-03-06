@@ -1,5 +1,7 @@
 package com.alpha.bluelock_logistics.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,15 @@ public class TruckService {
 	private CarrierRepository carrierRepository;
 
 	ResponseStructure<Truck> rstruck = new ResponseStructure<Truck>();
+
+	public ResponseEntity<ResponseStructure<List<Truck>>> getAllTrucks() {
+		List<Truck> allTrucks = truckRepository.findAll();
+		ResponseStructure<List<Truck>> rs = new ResponseStructure<List<Truck>>();
+		rs.setStatuscode(HttpStatus.OK.value());
+		rs.setMessage("All trucks retrieved");
+		rs.setData(allTrucks);
+		return new ResponseEntity<ResponseStructure<List<Truck>>>(rs, HttpStatus.OK);
+	}
 
 	public ResponseEntity<ResponseStructure<Truck>> saveTruck(Truck t) {
 		truckRepository.save(t);

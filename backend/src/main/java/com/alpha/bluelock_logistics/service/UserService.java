@@ -73,4 +73,18 @@ public class UserService {
 		}
 		return structure;
 	}
+
+	public ResponseStructure<User> login(String email, String password) {
+		ResponseStructure<User> structure = new ResponseStructure<>();
+		User user = userRepository.findByEmail(email);
+		if (user != null && user.getPassword().equals(password)) {
+			structure.setStatuscode(200);
+			structure.setMessage("Login successful");
+			structure.setData(user);
+		} else {
+			structure.setStatuscode(401);
+			structure.setMessage("Invalid email or password");
+		}
+		return structure;
+	}
 }
