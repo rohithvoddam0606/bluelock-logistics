@@ -14,7 +14,7 @@ import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
 import addressService from '../services/addressService';
 
-const Addresses = () => {
+const Addresses = ({ searchQuery = '' }) => {
   const [addresses, setAddresses] = useState([]);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -118,6 +118,7 @@ const Addresses = () => {
         data={addresses}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        searchQuery={searchQuery}
       />
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{editMode ? 'Edit Address' : 'Add Address'}</DialogTitle>

@@ -74,4 +74,14 @@ public class GlobalExceptionHandler {
 
 		return new ResponseEntity<ResponseStructure<Truck>>(rs, HttpStatus.INSUFFICIENT_STORAGE);
 	}
+
+	@ExceptionHandler(DuplicateEmailException.class)
+	public ResponseEntity<ResponseStructure<String>> handleDuplicateEmailException(DuplicateEmailException ex) {
+		ResponseStructure<String> rs = new ResponseStructure<>();
+		rs.setStatuscode(HttpStatus.BAD_REQUEST.value());
+		rs.setMessage(ex.getMessage());
+		rs.setData(null);
+
+		return new ResponseEntity<ResponseStructure<String>>(rs, HttpStatus.BAD_REQUEST);
+	}
 }

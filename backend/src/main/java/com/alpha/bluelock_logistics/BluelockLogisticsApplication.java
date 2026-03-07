@@ -9,6 +9,4 @@ public class BluelockLogisticsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BluelockLogisticsApplication.class, args);
 	}
-
 }
-												

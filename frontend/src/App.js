@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Box, Toolbar, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -33,64 +33,83 @@ const PrivateRoute = ({ children }) => {
   return authService.isAuthenticated() ? children : <Navigate to="/login" />;
 };
 
-function App() {
+const AppContent = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
+
+  // Clear search when navigating to a different page
+  useEffect(() => {
+    setSearchQuery('');
+  }, [location.pathname]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  return (
+    <>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/*"
+          element={
+            <PrivateRoute>
+              <Box sx={{ display: 'flex' }}>
+                <Navbar onMenuClick={handleDrawerToggle} onSearch={handleSearch} searchQuery={searchQuery} />
+                <Sidebar mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
+                <Box
+                  component="main"
+                  sx={{
+                    flexGrow: 1,
+                    p: 3,
+                    width: { sm: `calc(100% - 240px)` },
+                  }}
+                >
+                  <Toolbar />
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="/dashboard" element={<Dashboard searchQuery={searchQuery} />} />
+                    <Route path="/orders" element={<Orders searchQuery={searchQuery} />} />
+                    <Route path="/cargo" element={<Cargo searchQuery={searchQuery} />} />
+                    <Route path="/trucks" element={<Trucks searchQuery={searchQuery} />} />
+                    <Route path="/drivers" element={<Drivers searchQuery={searchQuery} />} />
+                    <Route path="/carriers" element={<Carriers searchQuery={searchQuery} />} />
+                    <Route path="/addresses" element={<Addresses searchQuery={searchQuery} />} />
+                    <Route path="/users" element={<Users searchQuery={searchQuery} />} />
+                  </Routes>
+                </Box>
+              </Box>
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </>
+  );
+};
+
+function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
         <CssBaseline />
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/*"
-            element={
-              <PrivateRoute>
-                <Box sx={{ display: 'flex' }}>
-                  <Navbar onMenuClick={handleDrawerToggle} />
-                  <Sidebar mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
-                  <Box
-                    component="main"
-                    sx={{
-                      flexGrow: 1,
-                      p: 3,
-                      width: { sm: `calc(100% - 240px)` },
-                    }}
-                  >
-                    <Toolbar />
-                    <Routes>
-                      <Route path="/" element={<Navigate to="/dashboard" />} />
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/orders" element={<Orders />} />
-                      <Route path="/cargo" element={<Cargo />} />
-                      <Route path="/trucks" element={<Trucks />} />
-                      <Route path="/drivers" element={<Drivers />} />
-                      <Route path="/carriers" element={<Carriers />} />
-                      <Route path="/addresses" element={<Addresses />} />
-                      <Route path="/users" element={<Users />} />
-                    </Routes>
-                  </Box>
-                </Box>
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
+        <AppContent />
       </Router>
     </ThemeProvider>
   );

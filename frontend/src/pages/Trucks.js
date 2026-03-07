@@ -16,9 +16,10 @@ import DataTable from '../components/DataTable';
 import truckService from '../services/truckService';
 import carrierService from '../services/carrierService';
 
-const Trucks = () => {
+const Trucks = ({ searchQuery = '' }) => {
   const [trucks, setTrucks] = useState([]);
   const [carriers, setCarriers] = useState([]);
+  const [addresses, setAddresses] = useState([]);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -26,17 +27,23 @@ const Trucks = () => {
     capacity: '',
     status: 'Active',
     carrierId: '',
+    currentLocationId: '',
   });
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     fetchTrucks();
     fetchCarriers();
+    fetchAddresses();
   }, []);
 
   const fetchTrucks = async () => {
     try {
+      console.log('Fetching trucks...');
       const response = await truckService.getAllTrucks();
+      console.log('Trucks response:', response);
+      console.log('Trucks data:', response.data);
+      console.log('Trucks array:', response.data.data);
       setTrucks(response.data.data || []);
     } catch (error) {
       console.error('Failed to fetch trucks:', error);
@@ -53,10 +60,20 @@ const Trucks = () => {
     }
   };
 
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/addresses');
+      const data = await response.json();
+      setAddresses(data.data || []);
+    } catch (error) {
+      console.error('Failed to fetch addresses:', error);
+    }
+  };
+
   const handleOpen = () => {
     setOpen(true);
     setEditMode(false);
-    setFormData({ name: '', number: '', capacity: '', status: 'Available', carrierId: '' });
+    setFormData({ name: '', number: '', capacity: '', status: 'Available', carrierId: '', currentLocationId: '' });
   };
 
   const handleClose = () => {
@@ -69,11 +86,17 @@ const Trucks = () => {
 
   const handleSubmit = async () => {
     try {
+      const truckData = {
+        ...formData,
+        carrier: formData.carrierId ? { id: formData.carrierId } : null,
+        currentLocation: formData.currentLocationId ? { id: formData.currentLocationId } : null,
+      };
+      
       if (editMode) {
-        await truckService.updateTruck(formData.id, formData);
+        await truckService.updateTruck(formData.id, truckData);
         toast.success('Truck updated successfully');
       } else {
-        await truckService.createTruck(formData);
+        await truckService.createTruck(truckData);
         toast.success('Truck created successfully');
       }
       fetchTrucks();
@@ -84,7 +107,11 @@ const Trucks = () => {
   };
 
   const handleEdit = (truck) => {
-    setFormData(truck);
+    setFormData({
+      ...truck,
+      carrierId: truck.carrier?.id || '',
+      currentLocationId: truck.currentLocation?.id || '',
+    });
     setEditMode(true);
     setOpen(true);
   };
@@ -142,6 +169,14 @@ const Trucks = () => {
       width: 200,
       renderCell: (row) => row.carrier?.name || 'Not Assigned'
     },
+    { 
+      field: 'currentLocation', 
+      headerName: 'Current Location',
+      width: 250,
+      renderCell: (row) => row.currentLocation 
+        ? `${row.currentLocation.city}, ${row.currentLocation.state}` 
+        : 'Not Set'
+    },
   ];
 
   return (
@@ -157,6 +192,7 @@ const Trucks = () => {
         data={trucks}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        searchQuery={searchQuery}
       />
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{editMode ? 'Edit Truck' : 'Add Truck'}</DialogTitle>
@@ -215,6 +251,22 @@ const Trucks = () => {
             {carriers.map((carrier) => (
               <MenuItem key={carrier.id} value={carrier.id}>
                 {carrier.name}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            margin="normal"
+            fullWidth
+            select
+            label="Current Location"
+            name="currentLocationId"
+            value={formData.currentLocationId}
+            onChange={handleChange}
+          >
+            <MenuItem value="">None</MenuItem>
+            {addresses.map((address) => (
+              <MenuItem key={address.id} value={address.id}>
+                {address.street}, {address.city}, {address.state} - {address.pincode}
               </MenuItem>
             ))}
           </TextField>

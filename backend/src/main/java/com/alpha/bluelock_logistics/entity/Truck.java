@@ -13,8 +13,12 @@ public class Truck {
 	private int number;
 	private int capacity;
 	private String status;
+	
 	@ManyToOne
 	private Carrier carrier;
+	
+	@ManyToOne
+	private Address currentLocation;
 
 	public int getId() {
 		return id;
@@ -64,7 +68,15 @@ public class Truck {
 		this.carrier = carrier;
 	}
 
-	public Truck(int id, String name, int number, int capacity, String status, Carrier carrier) {
+	public Address getCurrentLocation() {
+		return currentLocation;
+	}
+
+	public void setCurrentLocation(Address currentLocation) {
+		this.currentLocation = currentLocation;
+	}
+
+	public Truck(int id, String name, int number, int capacity, String status, Carrier carrier, Address currentLocation) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -72,6 +84,7 @@ public class Truck {
 		this.capacity = capacity;
 		this.status = status;
 		this.carrier = carrier;
+		this.currentLocation = currentLocation;
 	}
 
 	public Truck() {
@@ -81,7 +94,7 @@ public class Truck {
 	@Override
 	public String toString() {
 		return "Truck [id=" + id + ", name=" + name + ", number=" + number + ", capacity=" + capacity + ", status="
-				+ status + ", carrier=" + carrier + "]";
+				+ status + ", carrier=" + carrier + ", currentLocation=" + currentLocation + "]";
 	}
 
 }

@@ -76,4 +76,33 @@ public class TruckService {
 		return new ResponseEntity<ResponseStructure<Truck>>(rstruck, HttpStatus.OK);
 	}
 
+	public ResponseEntity<ResponseStructure<Truck>> updateTruck(int id, Truck updatedTruck) {
+		Truck existingTruck = truckRepository.findById(id)
+				.orElseThrow(() -> new TruckWithIdNotFoundException("Truck with id " + id + " not found"));
+
+		existingTruck.setName(updatedTruck.getName());
+		existingTruck.setNumber(updatedTruck.getNumber());
+		existingTruck.setCapacity(updatedTruck.getCapacity());
+		existingTruck.setStatus(updatedTruck.getStatus());
+		
+		if (updatedTruck.getCarrier() != null && updatedTruck.getCarrier().getId() > 0) {
+			Carrier carrier = carrierRepository.findById(updatedTruck.getCarrier().getId())
+					.orElseThrow(() -> new CarrierWithIdNotFoundException("Carrier not found"));
+			existingTruck.setCarrier(carrier);
+		}
+		
+		if (updatedTruck.getCurrentLocation() != null && updatedTruck.getCurrentLocation().getId() > 0) {
+			existingTruck.setCurrentLocation(updatedTruck.getCurrentLocation());
+		} else {
+			existingTruck.setCurrentLocation(null);
+		}
+
+		truckRepository.save(existingTruck);
+
+		rstruck.setStatuscode(HttpStatus.OK.value());
+		rstruck.setMessage("Truck updated successfully");
+		rstruck.setData(existingTruck);
+		return new ResponseEntity<ResponseStructure<Truck>>(rstruck, HttpStatus.OK);
+	}
+
 }

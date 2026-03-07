@@ -14,7 +14,10 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	private String name;
+	
+	@jakarta.persistence.Column(unique = true)
 	private String email;
+	
 	private String password;
 	private String role; // "CUSTOMER" or "ADMIN"
 

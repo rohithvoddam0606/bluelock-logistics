@@ -12,7 +12,32 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Visibility } from '@mui/icons-material';
 
-const DataTable = ({ columns, data, onEdit, onDelete, onView }) => {
+const DataTable = ({ columns, data = [], onEdit, onDelete, onView, searchQuery = '' }) => {
+  // Filter data based on search query
+  const filteredData = React.useMemo(() => {
+    // Ensure data is an array
+    const dataArray = Array.isArray(data) ? data : [];
+    
+    if (!searchQuery || searchQuery.trim() === '') return dataArray;
+    
+    const query = searchQuery.toLowerCase().trim();
+    return dataArray.filter(row => {
+      return columns.some(column => {
+        const value = row[column.field];
+        if (value === null || value === undefined) return false;
+        
+        // Handle nested objects (like carrier.name)
+        if (typeof value === 'object' && value !== null) {
+          return Object.values(value).some(v => 
+            v !== null && v !== undefined && String(v).toLowerCase().includes(query)
+          );
+        }
+        
+        return String(value).toLowerCase().includes(query);
+      });
+    });
+  }, [data, searchQuery, columns]);
+
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'delivered':
@@ -56,7 +81,20 @@ const DataTable = ({ columns, data, onEdit, onDelete, onView }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row) => (
+          {!Array.isArray(data) ? (
+            <TableRow>
+              <TableCell colSpan={columns.length + 1} align="center">
+                Loading data...
+              </TableCell>
+            </TableRow>
+          ) : filteredData.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={columns.length + 1} align="center">
+                {searchQuery && searchQuery.trim() !== '' ? 'No results found for your search' : 'No data available'}
+              </TableCell>
+            </TableRow>
+          ) : (
+            filteredData.map((row) => (
             <TableRow key={row.id} hover>
               {columns.map((column) => (
                 <TableCell key={column.field}>
@@ -81,7 +119,8 @@ const DataTable = ({ columns, data, onEdit, onDelete, onView }) => {
                 )}
               </TableCell>
             </TableRow>
-          ))}
+          ))
+          )}
         </TableBody>
       </Table>
     </TableContainer>

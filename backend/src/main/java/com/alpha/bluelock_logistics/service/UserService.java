@@ -17,6 +17,16 @@ public class UserService {
 
 	public ResponseStructure<User> saveUser(User user) {
 		ResponseStructure<User> structure = new ResponseStructure<>();
+		
+		// Check if email already exists
+		User existingUser = userRepository.findByEmail(user.getEmail());
+		if (existingUser != null) {
+			structure.setStatuscode(400);
+			structure.setMessage("Email already exists");
+			structure.setData(null);
+			return structure;
+		}
+		
 		structure.setStatuscode(201);
 		structure.setMessage("User saved successfully");
 		structure.setData(userRepository.save(user));

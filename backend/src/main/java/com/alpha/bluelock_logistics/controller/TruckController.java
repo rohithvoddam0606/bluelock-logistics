@@ -60,4 +60,14 @@ public class TruckController {
 	public ResponseEntity<ResponseStructure<Truck>> updateTruck(@PathVariable int truckid, @PathVariable int carrierid) {
 		return truckService.modifyTruck(truckid, carrierid);
 	}
+
+	@PutMapping("/trucks/{id}")
+	public ResponseEntity<ResponseStructure<Truck>> updateTruckFull(@PathVariable int id, @RequestBody Truck truck) {
+		return truckService.updateTruck(id, truck);
+	}
+
+	@DeleteMapping("/trucks/{id}")
+	public ResponseEntity<ResponseStructure<Truck>> deleteTruckById(@PathVariable int id) {
+		return truckService.removeTruck(id);
+	}
 }

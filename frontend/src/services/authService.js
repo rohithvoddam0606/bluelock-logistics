@@ -2,15 +2,20 @@ import api from './api';
 
 const authService = {
   login: async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
-    if (response.data.statuscode === 200 && response.data.data) {
-      // Store user data and create a simple token (user ID)
-      localStorage.setItem('token', 'authenticated');
-      localStorage.setItem('user', JSON.stringify(response.data.data));
-    } else {
-      throw new Error(response.data.message || 'Login failed');
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      if (response.data.statuscode === 200 && response.data.data) {
+        // Store user data and create a simple token (user ID)
+        localStorage.setItem('token', 'authenticated');
+        localStorage.setItem('user', JSON.stringify(response.data.data));
+        return response.data;
+      } else {
+        throw new Error(response.data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Auth service error:', error);
+      throw error;
     }
-    return response.data;
   },
 
   register: async (userData) => {

@@ -14,7 +14,7 @@ import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
 import carrierService from '../services/carrierService';
 
-const Carriers = () => {
+const Carriers = ({ searchQuery = '' }) => {
   const [carriers, setCarriers] = useState([]);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -115,6 +115,7 @@ const Carriers = () => {
         data={carriers}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        searchQuery={searchQuery}
       />
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{editMode ? 'Edit Carrier' : 'Add Carrier'}</DialogTitle>

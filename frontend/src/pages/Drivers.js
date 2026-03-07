@@ -17,7 +17,7 @@ import driverService from '../services/driverService';
 import truckService from '../services/truckService';
 import carrierService from '../services/carrierService';
 
-const Drivers = () => {
+const Drivers = ({ searchQuery = '' }) => {
   const [drivers, setDrivers] = useState([]);
   const [trucks, setTrucks] = useState([]);
   const [carriers, setCarriers] = useState([]);
@@ -148,6 +148,7 @@ const Drivers = () => {
         data={drivers}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        searchQuery={searchQuery}
       />
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{editMode ? 'Edit Driver' : 'Add Driver'}</DialogTitle>

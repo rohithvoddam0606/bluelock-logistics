@@ -9,19 +9,25 @@ import {
   TextField,
   Typography,
   MenuItem,
+  IconButton,
+  Chip,
+  Grid,
+  Paper,
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Add, Close, LocalShipping, LocationOn } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
 import orderService from '../services/orderService';
 import carrierService from '../services/carrierService';
 import cargoService from '../services/cargoService';
 
-const Orders = () => {
+const Orders = ({ searchQuery = '' }) => {
   const [orders, setOrders] = useState([]);
   const [carriers, setCarriers] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [open, setOpen] = useState(false);
+  const [trackingOpen, setTrackingOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [formData, setFormData] = useState({
     orderDate: '',
     status: 'Pending',
@@ -39,7 +45,11 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
+      console.log('Fetching orders...');
       const response = await orderService.getAllOrders();
+      console.log('Orders response:', response);
+      console.log('Orders data:', response.data);
+      console.log('Orders array:', response.data.data);
       setOrders(response.data.data || []);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
@@ -119,6 +129,16 @@ const Orders = () => {
     }
   };
 
+  const handleTrack = (order) => {
+    setSelectedOrder(order);
+    setTrackingOpen(true);
+  };
+
+  const handleCloseTracking = () => {
+    setTrackingOpen(false);
+    setSelectedOrder(null);
+  };
+
   const columns = [
     { field: 'id', headerName: 'Order ID', width: 100 },
     { 
@@ -179,6 +199,23 @@ const Orders = () => {
       renderCell: (row) => row.unloading?.address ? 
         `${row.unloading.address.city}, ${row.unloading.address.state}` : 'N/A'
     },
+    {
+      field: 'track',
+      headerName: 'Track',
+      width: 120,
+      renderCell: (row) => (
+        (row.status === 'Pending' || row.status === 'In Transit') ? (
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<LocalShipping />}
+            onClick={() => handleTrack(row)}
+          >
+            Track
+          </Button>
+        ) : null
+      )
+    },
   ];
 
   return (
@@ -194,6 +231,7 @@ const Orders = () => {
         data={orders}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        searchQuery={searchQuery}
       />
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{editMode ? 'Edit Order' : 'Add Order'}</DialogTitle>
@@ -267,6 +305,145 @@ const Orders = () => {
           <Button onClick={handleSubmit} variant="contained">
             {editMode ? 'Update' : 'Create'}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Tracking Dialog */}
+      <Dialog open={trackingOpen} onClose={handleCloseTracking} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <LocalShipping color="primary" />
+              <Typography variant="h6">Order Tracking - #{selectedOrder?.id}</Typography>
+            </Box>
+            <IconButton onClick={handleCloseTracking}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          {selectedOrder && (
+            <Box>
+              {/* Order Status */}
+              <Paper elevation={2} sx={{ p: 2, mb: 3, bgcolor: '#f5f5f5' }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" color="textSecondary">Order Status</Typography>
+                    <Chip 
+                      label={selectedOrder.status}
+                      color={selectedOrder.status === 'In Transit' ? 'primary' : 'warning'}
+                      sx={{ mt: 1 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" color="textSecondary">Carrier</Typography>
+                    <Typography variant="body1" sx={{ mt: 1 }}>
+                      {selectedOrder.carrier?.name || 'Not Assigned'}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" color="textSecondary">Cargo</Typography>
+                    <Typography variant="body1" sx={{ mt: 1 }}>
+                      {selectedOrder.cargo?.name || 'N/A'}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" color="textSecondary">Order Date</Typography>
+                    <Typography variant="body1" sx={{ mt: 1 }}>
+                      {selectedOrder.orderdate ? new Date(selectedOrder.orderdate).toLocaleDateString() : 'N/A'}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Paper>
+
+              {/* Loading Address */}
+              <Paper elevation={2} sx={{ p: 2, mb: 2, border: '2px solid #4caf50' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <LocationOn sx={{ color: '#4caf50' }} />
+                  <Typography variant="h6" color="#4caf50">Loading Point (Origin)</Typography>
+                </Box>
+                {selectedOrder.loading?.address ? (
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      {selectedOrder.loading.address.street}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {selectedOrder.loading.address.city}, {selectedOrder.loading.address.state} - {selectedOrder.loading.address.pincode}
+                    </Typography>
+                    {selectedOrder.loading.date && (
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        <strong>Loading Date:</strong> {new Date(selectedOrder.loading.date).toLocaleDateString()}
+                        {selectedOrder.loading.time && ` at ${selectedOrder.loading.time}`}
+                      </Typography>
+                    )}
+                  </Box>
+                ) : (
+                  <Typography color="textSecondary">No loading address available</Typography>
+                )}
+              </Paper>
+
+              {/* Route Indicator */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                <Box sx={{ 
+                  width: 4, 
+                  height: 60, 
+                  bgcolor: '#2196f3',
+                  position: 'relative',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 0,
+                    height: 0,
+                    borderLeft: '8px solid transparent',
+                    borderRight: '8px solid transparent',
+                    borderTop: '12px solid #2196f3',
+                  }
+                }} />
+              </Box>
+
+              {/* Unloading Address */}
+              <Paper elevation={2} sx={{ p: 2, border: '2px solid #f44336' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <LocationOn sx={{ color: '#f44336' }} />
+                  <Typography variant="h6" color="#f44336">Unloading Point (Destination)</Typography>
+                </Box>
+                {selectedOrder.unloading?.address ? (
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      {selectedOrder.unloading.address.street}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {selectedOrder.unloading.address.city}, {selectedOrder.unloading.address.state} - {selectedOrder.unloading.address.pincode}
+                    </Typography>
+                    {selectedOrder.unloading.date && (
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        <strong>Expected Delivery:</strong> {new Date(selectedOrder.unloading.date).toLocaleDateString()}
+                        {selectedOrder.unloading.time && ` at ${selectedOrder.unloading.time}`}
+                      </Typography>
+                    )}
+                  </Box>
+                ) : (
+                  <Typography color="textSecondary">No unloading address available</Typography>
+                )}
+              </Paper>
+
+              {/* Additional Info */}
+              <Paper elevation={1} sx={{ p: 2, mt: 2, bgcolor: '#e3f2fd' }}>
+                <Typography variant="body2" color="textSecondary">
+                  <strong>Estimated Distance:</strong> Calculating route...
+                </Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                  <strong>Total Cost:</strong> ${selectedOrder.cost?.toFixed(2) || '0.00'}
+                </Typography>
+              </Paper>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseTracking}>Close</Button>
         </DialogActions>
       </Dialog>
     </Box>

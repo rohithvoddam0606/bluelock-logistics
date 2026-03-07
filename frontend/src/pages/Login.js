@@ -7,18 +7,29 @@ import {
   Typography,
   Box,
   Link,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
-import { LocalShipping } from '@mui/icons-material';
+import { LocalShipping, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import authService from '../services/authService';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
 
   const handleSubmit = async (e) => {
@@ -29,7 +40,7 @@ const Login = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(error.message || error.response?.data?.message || 'Login failed');
+      toast.error(error.response?.data?.message || error.message || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -53,14 +64,14 @@ const Login = () => {
               Sign in to your account
             </Typography>
           </Box>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} autoComplete="off">
             <TextField
               margin="normal"
               required
               fullWidth
               label="Email Address"
               name="email"
-              autoComplete="email"
+              autoComplete="off"
               autoFocus
               value={formData.email}
               onChange={handleChange}
@@ -71,10 +82,24 @@ const Login = () => {
               fullWidth
               name="password"
               label="Password"
-              type="password"
-              autoComplete="current-password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="new-password"
               value={formData.password}
               onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               type="submit"

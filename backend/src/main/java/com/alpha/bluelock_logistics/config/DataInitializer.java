@@ -132,6 +132,9 @@ public class DataInitializer implements CommandLineRunner {
             Carrier carrier1 = carrierRepository.findById(1).orElse(null);
             Carrier carrier2 = carrierRepository.findById(2).orElse(null);
             Carrier carrier3 = carrierRepository.findById(3).orElse(null);
+            Address addr1 = addressRepository.findById(1).orElse(null);
+            Address addr2 = addressRepository.findById(2).orElse(null);
+            Address addr3 = addressRepository.findById(3).orElse(null);
 
             // Create Trucks
             Truck truck1 = new Truck();
@@ -141,6 +144,7 @@ public class DataInitializer implements CommandLineRunner {
             truck1.setCapacity(5000);
             truck1.setStatus("Available");
             truck1.setCarrier(carrier1);
+            truck1.setCurrentLocation(addr1);
             truckRepository.save(truck1);
 
             Truck truck2 = new Truck();
@@ -150,6 +154,7 @@ public class DataInitializer implements CommandLineRunner {
             truck2.setCapacity(7500);
             truck2.setStatus("In Transit");
             truck2.setCarrier(carrier1);
+            truck2.setCurrentLocation(addr2);
             truckRepository.save(truck2);
 
             Truck truck3 = new Truck();
@@ -159,6 +164,7 @@ public class DataInitializer implements CommandLineRunner {
             truck3.setCapacity(10000);
             truck3.setStatus("Available");
             truck3.setCarrier(carrier2);
+            truck3.setCurrentLocation(addr3);
             truckRepository.save(truck3);
 
             Truck truck4 = new Truck();
@@ -168,6 +174,7 @@ public class DataInitializer implements CommandLineRunner {
             truck4.setCapacity(6000);
             truck4.setStatus("Maintenance");
             truck4.setCarrier(carrier2);
+            truck4.setCurrentLocation(addr1);
             truckRepository.save(truck4);
 
             Truck truck5 = new Truck();
@@ -177,6 +184,7 @@ public class DataInitializer implements CommandLineRunner {
             truck5.setCapacity(8000);
             truck5.setStatus("In Transit");
             truck5.setCarrier(carrier3);
+            truck5.setCurrentLocation(addr2);
             truckRepository.save(truck5);
 
             System.out.println("✅ Trucks created!");

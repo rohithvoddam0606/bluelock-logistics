@@ -14,7 +14,7 @@ import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
 import cargoService from '../services/cargoService';
 
-const Cargo = () => {
+const Cargo = ({ searchQuery = '' }) => {
   const [cargos, setCargos] = useState([]);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -124,6 +124,7 @@ const Cargo = () => {
         data={cargos}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        searchQuery={searchQuery}
       />
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{editMode ? 'Edit Cargo' : 'Add Cargo'}</DialogTitle>
