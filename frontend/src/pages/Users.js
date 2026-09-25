@@ -13,6 +13,7 @@ import {
 import { Add } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
+import PageHeader from '../components/PageHeader';
 import userService from '../services/userService';
 
 const Users = ({ searchQuery = '' }) => {
@@ -113,12 +114,11 @@ const Users = ({ searchQuery = '' }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">User Management</Typography>
+      <PageHeader title="User Management">
         <Button variant="contained" startIcon={<Add />} onClick={handleOpen}>
           Add User
         </Button>
-      </Box>
+      </PageHeader>
       <DataTable
         columns={columns}
         data={users}

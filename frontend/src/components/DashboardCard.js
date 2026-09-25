@@ -1,9 +1,21 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 
-const DashboardCard = ({ title, value, icon, color }) => {
+const DashboardCard = ({ title, value, icon, color, onClick }) => {
   return (
-    <Card sx={{ height: '100%', boxShadow: 3 }}>
+    <Card 
+      sx={{ 
+        height: '100%', 
+        boxShadow: 3,
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        '&:hover': onClick ? {
+          transform: 'translateY(-4px)',
+          boxShadow: 6,
+        } : {},
+      }}
+      onClick={onClick}
+    >
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>

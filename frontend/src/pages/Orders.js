@@ -14,15 +14,20 @@ import {
   Grid,
   Paper,
 } from '@mui/material';
-import { Add, Close, LocalShipping, LocationOn } from '@mui/icons-material';
+import { Add, Close, LocalShipping, LocationOn, FilterList } from '@mui/icons-material';
 import { toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom';
 import DataTable from '../components/DataTable';
+import PageHeader from '../components/PageHeader';
 import orderService from '../services/orderService';
 import carrierService from '../services/carrierService';
 import cargoService from '../services/cargoService';
 
 const Orders = ({ searchQuery = '' }) => {
+  const location = useLocation();
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [activeStatusFilter, setActiveStatusFilter] = useState('');
   const [carriers, setCarriers] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [open, setOpen] = useState(false);
@@ -36,6 +41,21 @@ const Orders = ({ searchQuery = '' }) => {
     cargoId: '',
   });
   const [editMode, setEditMode] = useState(false);
+
+  // Apply status filter from dashboard navigation or local selection
+  useEffect(() => {
+    const navFilter = location.state?.statusFilter || '';
+    setActiveStatusFilter(navFilter);
+  }, [location.state]);
+
+  // Re-filter whenever orders list or active filter changes
+  useEffect(() => {
+    if (activeStatusFilter) {
+      setFilteredOrders(orders.filter(o => o.status === activeStatusFilter));
+    } else {
+      setFilteredOrders(orders);
+    }
+  }, [orders, activeStatusFilter]);
 
   useEffect(() => {
     fetchOrders();
@@ -220,15 +240,27 @@ const Orders = ({ searchQuery = '' }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Orders</Typography>
+      <PageHeader title="Orders">
         <Button variant="contained" startIcon={<Add />} onClick={handleOpen}>
           Add Order
         </Button>
-      </Box>
+      </PageHeader>
+      
+      {activeStatusFilter && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <FilterList fontSize="small" color="primary" />
+          <Chip 
+            label={`Filter: ${activeStatusFilter}`}
+            color="primary"
+            size="small"
+            onDelete={() => setActiveStatusFilter('')}
+          />
+        </Box>
+      )}
+      
       <DataTable
         columns={columns}
-        data={orders}
+        data={filteredOrders}
         onEdit={handleEdit}
         onDelete={handleDelete}
         searchQuery={searchQuery}

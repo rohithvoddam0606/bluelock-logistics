@@ -13,6 +13,7 @@ import {
 import { Add } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
+import PageHeader from '../components/PageHeader';
 import driverService from '../services/driverService';
 import truckService from '../services/truckService';
 import carrierService from '../services/carrierService';
@@ -137,12 +138,11 @@ const Drivers = ({ searchQuery = '' }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Driver Management</Typography>
+      <PageHeader title="Driver Management">
         <Button variant="contained" startIcon={<Add />} onClick={handleOpen}>
           Add Driver
         </Button>
-      </Box>
+      </PageHeader>
       <DataTable
         columns={columns}
         data={drivers}

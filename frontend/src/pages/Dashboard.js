@@ -9,6 +9,7 @@ import {
   HourglassEmpty,
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../components/DashboardCard';
 import orderService from '../services/orderService';
 import truckService from '../services/truckService';
@@ -16,6 +17,7 @@ import driverService from '../services/driverService';
 import carrierService from '../services/carrierService';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalOrders: 0,
     activeTrucks: 0,
@@ -80,6 +82,7 @@ const Dashboard = () => {
             value={stats.totalOrders}
             icon={<ShoppingCart />}
             color="#2196f3"
+            onClick={() => navigate('/orders')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -88,6 +91,7 @@ const Dashboard = () => {
             value={stats.activeTrucks}
             icon={<LocalShipping />}
             color="#4caf50"
+            onClick={() => navigate('/trucks')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -96,6 +100,7 @@ const Dashboard = () => {
             value={stats.totalDrivers}
             icon={<Person />}
             color="#ff9800"
+            onClick={() => navigate('/drivers')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -104,6 +109,7 @@ const Dashboard = () => {
             value={stats.totalCarriers}
             icon={<Business />}
             color="#9c27b0"
+            onClick={() => navigate('/carriers')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -112,6 +118,7 @@ const Dashboard = () => {
             value={stats.deliveredOrders}
             icon={<CheckCircle />}
             color="#4caf50"
+            onClick={() => navigate('/orders', { state: { statusFilter: 'Delivered' } })}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -120,6 +127,7 @@ const Dashboard = () => {
             value={stats.pendingOrders}
             icon={<HourglassEmpty />}
             color="#ff9800"
+            onClick={() => navigate('/orders', { state: { statusFilter: 'Pending' } })}
           />
         </Grid>
         <Grid item xs={12} md={8}>

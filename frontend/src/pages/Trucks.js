@@ -13,6 +13,7 @@ import {
 import { Add } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
+import PageHeader from '../components/PageHeader';
 import truckService from '../services/truckService';
 import carrierService from '../services/carrierService';
 
@@ -181,12 +182,11 @@ const Trucks = ({ searchQuery = '' }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Truck Management</Typography>
+      <PageHeader title="Truck Management">
         <Button variant="contained" startIcon={<Add />} onClick={handleOpen}>
           Add Truck
         </Button>
-      </Box>
+      </PageHeader>
       <DataTable
         columns={columns}
         data={trucks}

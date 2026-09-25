@@ -12,6 +12,7 @@ import {
 import { Add } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
+import PageHeader from '../components/PageHeader';
 import addressService from '../services/addressService';
 
 const Addresses = ({ searchQuery = '' }) => {
@@ -107,12 +108,11 @@ const Addresses = ({ searchQuery = '' }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Address Management</Typography>
+      <PageHeader title="Address Management">
         <Button variant="contained" startIcon={<Add />} onClick={handleOpen}>
           Add Address
         </Button>
-      </Box>
+      </PageHeader>
       <DataTable
         columns={columns}
         data={addresses}

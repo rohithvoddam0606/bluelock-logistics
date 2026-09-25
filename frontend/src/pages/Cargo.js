@@ -12,6 +12,7 @@ import {
 import { Add } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
+import PageHeader from '../components/PageHeader';
 import cargoService from '../services/cargoService';
 
 const Cargo = ({ searchQuery = '' }) => {
@@ -113,12 +114,11 @@ const Cargo = ({ searchQuery = '' }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4">Cargo Management</Typography>
+      <PageHeader title="Cargo Management">
         <Button variant="contained" startIcon={<Add />} onClick={handleOpen}>
           Add Cargo
         </Button>
-      </Box>
+      </PageHeader>
       <DataTable
         columns={columns}
         data={cargos}
